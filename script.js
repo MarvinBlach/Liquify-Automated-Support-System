@@ -98,36 +98,35 @@ function checkLiElementsValues(liElements) {
 
 function checkDuplicateLiSettings() {
     const liSections = document.querySelectorAll('[li-section]');
-    console.log(`Found ${liSections.length} elements with 'li-section' attribute.`); // Log the count of li-section elements
+    console.log(`Found ${liSections.length} elements with 'li-section' attribute.`);
 
     liSections.forEach(section => {
         const sectionName = section.getAttribute('li-section');
-        console.log(`Processing section: ${sectionName}`); // Log the name of the section being processed
+        console.log(`Processing section: ${sectionName}`);
+        console.log(`Section innerHTML: ${section.innerHTML}`); // Log the innerHTML of the section
+
+        const allElements = section.getElementsByTagName('*');
+        const descendants = Array.from(allElements).filter(element => Array.from(element.attributes).some(attr => attr.name.startsWith('li-')));
+        console.log(`Found ${descendants.length} descendants with 'li-' attribute in section ${sectionName}.`);
 
         const settingsMap = {};
-        const descendants = section.querySelectorAll('[li-settings^="li-settings:"]');
-        console.log(`Found ${descendants.length} descendants with 'li-settings' in section ${sectionName}.`); // Log the count of descendants with li-settings
-
         descendants.forEach(descendant => {
-            const liSettings = descendant.getAttribute('li-settings');
-            console.log(`Found li-settings: ${liSettings}`); // Log the li-settings attribute
+            Array.from(descendant.attributes).forEach(attr => {
+                if (attr.name.startsWith('li-settings')) {
+                    console.log(`Found attribute: ${attr.name}=${attr.value}`); // Log the attribute
 
-            if (liSettings) {
-                const match = liSettings.match(/li-settings:([^=]+)="([^"]+)"/);
-                if (match && match.length === 3) {
-                    const key = match[1].trim().toLowerCase();
-                    const value = match[2].trim().toLowerCase();
+                    const key = attr.name + '=' + attr.value.trim().toLowerCase();
 
-                    console.log(`Key: ${key}, Value: ${value}`); // Log the extracted key and value
+                    console.log(`Key: ${key}`); // Log the extracted key
 
-                    if (settingsMap[key] && settingsMap[key] === value) {
-                        console.log(`Duplicate li-settings value found in ${sectionName}: ${key} = ${value}`);
-                        displayError(`li-section`, `Duplicate li-settings value found in ${sectionName}: ${key} = ${value}`);
+                    if (settingsMap[key]) {
+                        console.log(`Duplicate attribute found in ${sectionName}: ${key}`);
+                        displayError(`li-section`, `Duplicate attribute found in ${sectionName}: ${key}`);
                     } else {
-                        settingsMap[key] = value;
+                        settingsMap[key] = true;
                     }
                 }
-            }
+            });
         });
     });
 }

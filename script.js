@@ -1,3 +1,87 @@
+
+function toggleModal() {
+    const closeButton = document.querySelector('[ass_closer]');
+    const component = document.querySelector('.ass_component');
+
+    closeButton.addEventListener('click', function() {
+        component.classList.toggle('ass_closed');
+    });
+}
+
+
+function mapAttributes(element, liElements = []) {
+    const attributeMap = {};
+
+    Array.from(element.attributes).forEach(attr => {
+        if (attr.name.startsWith('li-')) {
+            attributeMap[attr.name] = {
+                value: attr.value,
+                element: element.outerHTML
+            };
+            liElements.push({ element, attr });
+        }
+    });
+
+    const children = Array.from(element.children);
+    if (children.length > 0) {
+        attributeMap.children = children.map(child => mapAttributes(child, liElements));
+    }
+
+    return attributeMap;
+}
+
+function logAttributeStructure() {
+    const rootElement = document.documentElement;
+    const attributeStructure = mapAttributes(rootElement);
+    console.log(attributeStructure);
+}
+
+function displayError(attributeName, reason) {
+    const errorMessage = `Error found in ${attributeName}: ${reason}`;
+
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'ass_result-error';
+
+    const textDiv = document.createElement('div');
+    textDiv.className = 'ass_text';
+    textDiv.textContent = errorMessage;
+
+    errorDiv.appendChild(textDiv);
+
+    const contentInner = document.querySelector('.ass_content-inner');
+    contentInner.appendChild(errorDiv);
+}
+
+
+function checkLiAttributes(liElements) {
+    liElements.forEach(({ element, attr }) => {
+        const pageWrapper = document.querySelector('.page-wrapper');
+        if (!pageWrapper.contains(element) && element.tagName !== 'BODY') {
+            displayError(attr.name, 'Attribute found outside of .page-wrapper and is not the body element');
+        }
+    });
+}
+
+
+function runChecks() {
+    const liElements = [];
+    mapAttributes(document.documentElement, liElements);
+
+    const checkButton = document.querySelector('[ass_check]');
+    checkButton.addEventListener('click', function() {
+        checkLiAttributes(liElements);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const modalHTML = createModalHTML();
+    document.body.innerHTML += modalHTML;
+    generateCSS();
+    toggleModal();
+    runChecks();
+});
+
+
 function createModalHTML() {
     return `
     <div class="ass_component">
@@ -14,9 +98,6 @@ function createModalHTML() {
             </div>
             <div class="ass_content">
                 <div id="w-node-_409b393b-78eb-73c3-19a0-b5eaabc02f13-1e00a484" class="ass_content-inner">
-                    <div class="ass_result-error">
-                        <div class="ass_text">Error</div>
-                    </div>
                     <div class="ass_result-correct">
                         <div class="ass_text">You did a great job.<br>No errors.</div>
                     </div>
@@ -38,7 +119,7 @@ function generateCSS() {
         --ass_gren: #259d4d;
       }
       
-      body {
+      .ass_component {
         color: #333;
         font-family: Spacemono, sans-serif;
         font-size: 14px;
@@ -179,22 +260,3 @@ function generateCSS() {
     style.textContent = css;
     document.head.appendChild(style);
 }
-
-
-function toggleModal() {
-    const closeButton = document.querySelector('[ass_closer]');
-    const component = document.querySelector('.ass_component');
-
-    closeButton.addEventListener('click', function() {
-        component.classList.toggle('ass_closed');
-    });
-}
-
-
-
-document.addEventListener('DOMContentLoaded', function() {
-    const modalHTML = createModalHTML();
-    document.body.innerHTML += modalHTML;
-    generateCSS()
-    toggleModal();
-});

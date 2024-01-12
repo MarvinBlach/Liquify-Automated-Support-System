@@ -62,6 +62,38 @@ function checkLiAttributes(liElements) {
     });
 }
 
+function checkDuplicateLiSections(liElements) {
+    const liSectionValues = {};
+
+    liElements.forEach(({ element, attr }) => {
+        if (attr.name === 'li-section') {
+            if (liSectionValues[attr.value]) {
+                displayError(attr.name, `Duplicate value found: ${attr.value}`);
+            } else {
+                liSectionValues[attr.value] = true;
+            }
+        }
+    });
+}
+
+
+function checkLiElementsValues(liElements) {
+    const allowedValues = ['direct-add-to-cart', 'mini-cart-toggle', 'mini-cart-item-count', 'mini-cart-empty', 'mini-cart', 'mini-cart-container', 'mini-cart-full', 'mini-cart-item', 'mini-cart-item-increase', 'mini-cart-item-decrease', 'mini-cart-item-remove', 'mini-cart-item-quantity'];
+    const liElementsValues = {};
+
+    liElements.forEach(({ element, attr }) => {
+        if (attr.name === 'li-elements') {
+            if (!allowedValues.includes(attr.value)) {
+                displayError(attr.name, `Invalid value found: ${attr.value}`);
+            } else if (liElementsValues[attr.value]) {
+                displayError(attr.name, `Duplicate value found: ${attr.value}`);
+            } else {
+                liElementsValues[attr.value] = true;
+            }
+        }
+    });
+}
+
 
 function runChecks() {
     const liElements = [];
@@ -70,6 +102,9 @@ function runChecks() {
     const checkButton = document.querySelector('[ass_check]');
     checkButton.addEventListener('click', function() {
         checkLiAttributes(liElements);
+        checkDuplicateLiSections(liElements);
+        checkLiElementsValues(liElements);
+
     });
 }
 

@@ -95,16 +95,21 @@ function checkLiElementsValues(liElements) {
 }
 
 
+function clearErrors() {
+    const errorElements = document.querySelectorAll('.ass_result-error');
+    errorElements.forEach(element => element.remove());
+}
+
 function runChecks() {
     const liElements = [];
     mapAttributes(document.documentElement, liElements);
 
     const checkButton = document.querySelector('[ass_check]');
     checkButton.addEventListener('click', function() {
+        clearErrors();
         checkLiAttributes(liElements);
         checkDuplicateLiSections(liElements);
         checkLiElementsValues(liElements);
-
     });
 }
 

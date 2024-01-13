@@ -51,23 +51,29 @@ function displayError(attributeName, reason) {
     contentInner.appendChild(errorDiv);
 }
 
-function displaySuccessMessage() {
-    const errorElements = document.querySelectorAll('.ass_result-error');
+let errorDisplayDelay = 0;
 
-    if (errorElements.length === 0) {
-        const contentInner = document.querySelector('.ass_content-inner');
-        const successMessage = "You did a great job.<br>No errors.";
+function displayError(attributeName, reason) {
+    const contentInner = document.querySelector('.ass_content-inner');
+    const errorMessage = `Error found in ${attributeName}: ${reason}`;
 
-        const successDiv = document.createElement('div');
-        successDiv.className = 'ass_result-correct';
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'ass_result-error';
 
-        const textDiv = document.createElement('div');
-        textDiv.className = 'ass_text';
-        textDiv.innerHTML = successMessage;
+    const textDiv = document.createElement('div');
+    textDiv.className = 'ass_text';
+    textDiv.textContent = errorMessage;
 
-        successDiv.appendChild(textDiv);
-        contentInner.appendChild(successDiv);
-    }
+    errorDiv.appendChild(textDiv);
+
+    setTimeout(() => {
+        contentInner.appendChild(errorDiv);
+        setTimeout(() => {
+            errorDiv.classList.add('shown');
+        }, 50);
+    }, errorDisplayDelay);
+
+    errorDisplayDelay += 50;
 }
 
 
@@ -326,12 +332,18 @@ function generateCSS() {
       }
 
       .ass_result-error {
-        min-height: 8rem !important;
+        min-height: 9rem !important;
+        transition: opacity 0.5s ease-in-out;
+        opacity: 0;
       }
+
+      .ass_result-error.shown {
+        opacity: 1;
+    }
       
       .ass_component {
         color: #333;
-        font-family: Spacemono, sans-serif;
+        font-family: Inter, sans-serif;
         font-size: 14px;
         font-weight: 400;
         line-height: 20px;

@@ -57,21 +57,6 @@ function logAttributeStructure() {
 }
 
 
-function displayError(attributeName, reason) {
-    const contentInner = document.querySelector('.ass_content-inner');
-    const errorMessage = `Error found in ${attributeName}: ${reason}`;
-
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'ass_result-error';
-
-    const textDiv = document.createElement('div');
-    textDiv.className = 'ass_text';
-    textDiv.textContent = errorMessage;
-
-    errorDiv.appendChild(textDiv);
-    contentInner.appendChild(errorDiv);
-}
-
 let errorDisplayDelay = 0;
 
 function displayError(attributeName, reason) {

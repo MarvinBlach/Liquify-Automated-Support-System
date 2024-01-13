@@ -1,4 +1,3 @@
-
 function toggleModal() {
     const closeButton = document.querySelector('[ass_closer]');
     const component = document.querySelector('.ass_component');
@@ -16,7 +15,7 @@ function mapAttributes(element, liElements = []) {
         if (attr.name.startsWith('li-')) {
             attributeMap[attr.name] = {
                 value: attr.value,
-                element: element // Store the element itself, not its outerHTML
+                element: element.outerHTML
             };
             liElements.push({ element, attr });
         }
@@ -30,12 +29,12 @@ function mapAttributes(element, liElements = []) {
     return attributeMap;
 }
 
-
 function logAttributeStructure() {
     const rootElement = document.documentElement;
     const attributeStructure = mapAttributes(rootElement);
     console.log(attributeStructure);
 }
+
 
 function displayError(attributeName, reason, hasError = true) {
     const contentInner = document.querySelector('.ass_content-inner');
@@ -208,6 +207,41 @@ function checkAttributesHaveValue(liElements) {
     });
 }
 
+function checkLiPageValues(liElements) {
+    const validValues = ['blog', 'article', 'collection', 'categories', 'product', 'cart', 'gift-card', 'account', 'login', 'register', 'activate', 'reset', 'order', 'adresses', '404', 'password', 'search', 'remove'];
+
+    liElements.forEach(({ element, attr }) => {
+        if (attr.name === 'li-page') {
+            const valueParts = attr.value.split('-');
+            const baseValue = valueParts[0];
+            const isAlternative = valueParts.includes('alternative');
+
+            if (!validValues.includes(baseValue) && !isAlternative) {
+                console.log(`Found invalid li-page value: ${element.outerHTML}`);
+                highlightErrorElement(element);
+                displayError(attr.name, 'Invalid li-page value.');
+            }
+        }
+    });
+}
+
+
+function checkLiSettingsKeys(liElements) {
+    const validKeys = ['text', 'url', 'image', 'textarea', 'checkbox', 'richtext', 'html', 'article', 'blog', 'collection', 'product', 'info'];
+
+    liElements.forEach(({ element, attr }) => {
+        if (attr.name.startsWith('li-settings:')) {
+            const key = attr.name.split(':')[1];
+
+            if (!validKeys.includes(key)) {
+                console.log(`Found invalid li-settings key: ${key}`);
+                highlightErrorElement(element);
+                displayError(attr.name, 'Invalid li-settings key.');
+            }
+        }
+    });
+}
+
 
 function highlightErrorElement(element) {
     element.style.border = "4px solid red";
@@ -233,12 +267,16 @@ function runChecks() {
         checkLiSettingsWithoutLiSection();
         checkWronglyWrittenSettings(liElements);
         checkAttributesHaveValue(liElements);
+        checkLiPageValues(liElements);
+        checkLiSettingsKeys(liElements)
     });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
     const modalHTML = createModalHTML();
-    document.body.innerHTML += modalHTML;
+    const modalContainer = document.createElement('div');
+    modalContainer.innerHTML = modalHTML;
+    document.body.appendChild(modalContainer);
     generateCSS();
     toggleModal();
     runChecks();

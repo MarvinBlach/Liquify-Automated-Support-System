@@ -284,13 +284,22 @@ function clearErrors() {
     errorElements.forEach(element => element.remove());
 }
 
-function runChecks() {
-    const liElements = [];
-    mapAttributes(document.documentElement, liElements);
+function clearSuccess() {
+    const successElements = document.querySelectorAll('.ass_result-correct');
+    successElements.forEach(element => element.remove());
+}
 
+function runChecks() {
     const checkButton = document.querySelector('[ass_check]');
     checkButton.addEventListener('click', function() {
+        // Disable the button
+        checkButton.disabled = true;
+
+        const liElements = [];
+        mapAttributes(document.documentElement, liElements);
+
         clearErrors();
+        clearSuccess();
         checkLiAttributes(liElements);
         checkDuplicateLiSections(liElements);
         checkLiElementsValues(liElements);
@@ -299,9 +308,18 @@ function runChecks() {
         checkWronglyWrittenSettings(liElements);
         checkAttributesHaveValue(liElements);
         checkLiPageValues(liElements);
-        checkLiSettingsKeys(liElements)
+        checkLiSettingsKeys(liElements);
 
-        setTimeout(displaySuccessMessage, 100);
+        // Wait for 1 second before displaying the success message and re-enabling the button
+        // Wait for 1 second before re-enabling the button
+        setTimeout(function() {
+            const errorElements = document.querySelectorAll('.ass_result-error');
+            if (errorElements.length === 0) {
+                displaySuccessMessage();
+            }
+            // Re-enable the button
+            checkButton.disabled = false;
+        }, 1000);
     });
 }
 

@@ -36,22 +36,26 @@ function logAttributeStructure() {
 }
 
 
-function displayError(attributeName, reason, hasError = true) {
+function displayError(attributeName, reason) {
     const contentInner = document.querySelector('.ass_content-inner');
+    const errorMessage = `Error found in ${attributeName}: ${reason}`;
 
-    if (hasError) {
-        const errorMessage = `Error found in ${attributeName}: ${reason}`;
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'ass_result-error';
 
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'ass_result-error';
+    const textDiv = document.createElement('div');
+    textDiv.className = 'ass_text';
+    textDiv.textContent = errorMessage;
 
-        const textDiv = document.createElement('div');
-        textDiv.className = 'ass_text';
-        textDiv.textContent = errorMessage;
+    errorDiv.appendChild(textDiv);
+    contentInner.appendChild(errorDiv);
+}
 
-        errorDiv.appendChild(textDiv);
-        contentInner.appendChild(errorDiv);
-    } else {
+function displaySuccessMessage() {
+    const errorElements = document.querySelectorAll('.ass_result-error');
+
+    if (errorElements.length === 0) {
+        const contentInner = document.querySelector('.ass_content-inner');
         const successMessage = "You did a great job.<br>No errors.";
 
         const successDiv = document.createElement('div');
@@ -65,6 +69,8 @@ function displayError(attributeName, reason, hasError = true) {
         contentInner.appendChild(successDiv);
     }
 }
+
+
 
 
 function checkLiAttributes(liElements) {
@@ -269,6 +275,8 @@ function runChecks() {
         checkAttributesHaveValue(liElements);
         checkLiPageValues(liElements);
         checkLiSettingsKeys(liElements)
+
+        setTimeout(displaySuccessMessage, 100);
     });
 }
 

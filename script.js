@@ -76,6 +76,25 @@ function displayError(attributeName, reason) {
     errorDisplayDelay += 50;
 }
 
+function displaySuccessMessage() {
+    const errorElements = document.querySelectorAll('.ass_result-error');
+
+    if (errorElements.length === 0) {
+        const contentInner = document.querySelector('.ass_content-inner');
+        const successMessage = "You did a great job.<br>No errors.";
+
+        const successDiv = document.createElement('div');
+        successDiv.className = 'ass_result-correct';
+
+        const textDiv = document.createElement('div');
+        textDiv.className = 'ass_text';
+        textDiv.innerHTML = successMessage;
+
+        successDiv.appendChild(textDiv);
+        contentInner.appendChild(successDiv);
+    }
+}
+
 
 
 
@@ -290,6 +309,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const modalHTML = createModalHTML();
     const modalContainer = document.createElement('div');
     modalContainer.innerHTML = modalHTML;
+    modalContainer.style.position = 'relative'; // z-index only works on positioned elements
+    modalContainer.style.zIndex = '9999'; // any high number to ensure it's on top
     document.body.appendChild(modalContainer);
     generateCSS();
     toggleModal();

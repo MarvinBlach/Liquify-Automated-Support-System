@@ -1,4 +1,3 @@
-
 function toggleModal() {
     const closeButton = document.querySelector('[ass_closer]');
     const component = document.querySelector('.ass_component');
@@ -36,20 +35,35 @@ function logAttributeStructure() {
     console.log(attributeStructure);
 }
 
-function displayError(attributeName, reason) {
-    const errorMessage = `Error found in ${attributeName}: ${reason}`;
 
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'ass_result-error';
-
-    const textDiv = document.createElement('div');
-    textDiv.className = 'ass_text';
-    textDiv.textContent = errorMessage;
-
-    errorDiv.appendChild(textDiv);
-
+function displayError(attributeName, reason, hasError = true) {
     const contentInner = document.querySelector('.ass_content-inner');
-    contentInner.appendChild(errorDiv);
+
+    if (hasError) {
+        const errorMessage = `Error found in ${attributeName}: ${reason}`;
+
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'ass_result-error';
+
+        const textDiv = document.createElement('div');
+        textDiv.className = 'ass_text';
+        textDiv.textContent = errorMessage;
+
+        errorDiv.appendChild(textDiv);
+        contentInner.appendChild(errorDiv);
+    } else {
+        const successMessage = "You did a great job.<br>No errors.";
+
+        const successDiv = document.createElement('div');
+        successDiv.className = 'ass_result-correct';
+
+        const textDiv = document.createElement('div');
+        textDiv.className = 'ass_text';
+        textDiv.innerHTML = successMessage;
+
+        successDiv.appendChild(textDiv);
+        contentInner.appendChild(successDiv);
+    }
 }
 
 
@@ -58,10 +72,186 @@ function checkLiAttributes(liElements) {
         const pageWrapper = document.querySelector('.page-wrapper');
         if (!pageWrapper.contains(element) && element.tagName !== 'BODY') {
             displayError(attr.name, 'Attribute found outside of .page-wrapper and is not the body element');
+            highlightErrorElement(element);
         }
     });
 }
 
+function checkDuplicateLiSections(liElements) {
+    const liSectionValues = {};
+
+    liElements.forEach(({ element, attr }) => {
+        if (attr.name === 'li-section') {
+            if (liSectionValues[attr.value]) {
+                displayError(attr.name, `Duplicate value found: ${attr.value}`);
+                highlightErrorElement(element); // Add this line
+            } else {
+                liSectionValues[attr.value] = true;
+            }
+        }
+    });
+}
+
+
+function checkLiElementsValues(liElements) {
+    const allowedValues = ['direct-add-to-cart', 'mini-cart-toggle', 'mini-cart-item-count', 'mini-cart-empty', 'mini-cart', 'mini-cart-container', 'mini-cart-full', 'mini-cart-item', 'mini-cart-item-increase', 'mini-cart-item-decrease', 'mini-cart-item-remove', 'mini-cart-item-quantity'];
+    const liElementsValues = {};
+
+    liElements.forEach(({ element, attr }) => {
+        if (attr.name === 'li-elements') {
+            if (!allowedValues.includes(attr.value)) {
+                displayError(attr.name, `Invalid value found: ${attr.value}`);
+                highlightErrorElement(element); // Add this line
+            } else if (liElementsValues[attr.value]) {
+                displayError(attr.name, `Duplicate value found: ${attr.value}`);
+                highlightErrorElement(element); // Add this line
+            } else {
+                liElementsValues[attr.value] = true;
+            }
+        }
+    });
+}
+
+
+function checkDuplicateLiSettings() {
+    const liSections = document.querySelectorAll('[li-section]');
+    console.log(`Found ${liSections.length} elements with 'li-section' attribute.`);
+
+    liSections.forEach(section => {
+        const sectionName = section.getAttribute('li-section');
+        console.log(`Processing section: ${sectionName}`);
+        console.log(`Section innerHTML: ${section.innerHTML}`); // Log the innerHTML of the section
+
+        const allElements = section.getElementsByTagName('*');
+        const descendants = Array.from(allElements).filter(element => Array.from(element.attributes).some(attr => attr.name.startsWith('li-')));
+        console.log(`Found ${descendants.length} descendants with 'li-' attribute in section ${sectionName}.`);
+
+        const settingsMap = {};
+        descendants.forEach(descendant => {
+            Array.from(descendant.attributes).forEach(attr => {
+                if (attr.name.startsWith('li-settings')) {
+                    console.log(`Found attribute: ${attr.name}=${attr.value}`); // Log the attribute
+
+                    const key = attr.name + '=' + attr.value.trim().toLowerCase();
+
+                    console.log(`Key: ${key}`); // Log the extracted key
+
+                    if (settingsMap[key]) {
+                        console.log(`Duplicate attribute found in ${sectionName}: ${key}`);
+                        displayError(`li-section`, `Duplicate attribute found in ${sectionName}: ${key}`);
+                        highlightErrorElement(descendant); // Add this line
+                    } else {
+                        settingsMap[key] = true;
+                    }
+                }
+            });
+        });
+    });
+}
+
+function checkLiSettingsWithoutLiSection() {
+    const allElements = document.querySelectorAll('*');
+    const liSettingsElements = Array.from(allElements).filter(element => Array.from(element.attributes).some(attr => attr.name.startsWith('li-settings')));
+
+    let foundError = false;
+
+    liSettingsElements.forEach(element => {
+        let currentElement = element;
+        let foundLiSection = false;
+
+        while (currentElement) {
+            if (currentElement.hasAttribute('li-section')) {
+                foundLiSection = true;
+                break;
+            }
+            currentElement = currentElement.parentElement;
+        }
+
+        if (!foundLiSection) {
+            console.log(`Found li-settings without li-section: ${element.outerHTML}`);
+            highlightErrorElement(element); // Add this line
+            foundError = true;
+        }
+    });
+
+    if (foundError) {
+        displayError(`li-settings`, `Found one or more 'li-settings' without 'li-section' on the page.`);
+    }
+}
+
+function checkWronglyWrittenSettings(liElements) {
+    const wronglyWrittenSettingsVariants = ['li-setings', 'li-settngs', 'li-settins'];
+
+    liElements.forEach(({ element, attr }) => {
+        if (wronglyWrittenSettingsVariants.some(variant => attr.name.startsWith(variant))) {
+            console.log(`Found wrongly written settings word: ${element.outerHTML}`);
+            highlightErrorElement(element);
+            displayError(attr.name, 'Found wrongly written settings word.');
+        }
+    });
+}
+
+function checkAttributesHaveValue(liElements) {
+    const attributesToCheck = ['li-section', 'li-object', 'li-for', 'li-if', 'li-unless', 'li-tag', 'li-form', 'li-section', 'li-block'];
+
+    liElements.forEach(({ element, attr }) => {
+        if (attributesToCheck.includes(attr.name) && !attr.value) {
+            console.log(`Found attribute without value: ${element.outerHTML}`);
+            highlightErrorElement(element);
+            displayError(attr.name, 'Attribute value is empty.');
+        } else if (attr.name.startsWith('li-settings') && !attr.value) {
+            console.log(`Found li-settings attribute without value: ${element.outerHTML}`);
+            highlightErrorElement(element);
+            displayError(attr.name, 'li-settings attribute value is empty.');
+        }
+    });
+}
+
+function checkLiPageValues(liElements) {
+    const validValues = ['blog', 'article', 'collection', 'categories', 'product', 'cart', 'gift-card', 'account', 'login', 'register', 'activate', 'reset', 'order', 'adresses', '404', 'password', 'search', 'remove'];
+
+    liElements.forEach(({ element, attr }) => {
+        if (attr.name === 'li-page') {
+            const valueParts = attr.value.split('-');
+            const baseValue = valueParts[0];
+            const isAlternative = valueParts.includes('alternative');
+
+            if (!validValues.includes(baseValue) && !isAlternative) {
+                console.log(`Found invalid li-page value: ${element.outerHTML}`);
+                highlightErrorElement(element);
+                displayError(attr.name, 'Invalid li-page value.');
+            }
+        }
+    });
+}
+
+
+function checkLiSettingsKeys(liElements) {
+    const validKeys = ['text', 'url', 'image', 'textarea', 'checkbox', 'richtext', 'html', 'article', 'blog', 'collection', 'product', 'info'];
+
+    liElements.forEach(({ element, attr }) => {
+        if (attr.name.startsWith('li-settings:')) {
+            const key = attr.name.split(':')[1];
+
+            if (!validKeys.includes(key)) {
+                console.log(`Found invalid li-settings key: ${key}`);
+                highlightErrorElement(element);
+                displayError(attr.name, 'Invalid li-settings key.');
+            }
+        }
+    });
+}
+
+
+function highlightErrorElement(element) {
+    element.style.border = "4px solid red";
+}
+
+
+function clearErrors() {
+    const errorElements = document.querySelectorAll('.ass_result-error');
+    errorElements.forEach(element => element.remove());
+}
 
 function runChecks() {
     const liElements = [];
@@ -69,13 +259,24 @@ function runChecks() {
 
     const checkButton = document.querySelector('[ass_check]');
     checkButton.addEventListener('click', function() {
+        clearErrors();
         checkLiAttributes(liElements);
+        checkDuplicateLiSections(liElements);
+        checkLiElementsValues(liElements);
+        checkDuplicateLiSettings();
+        checkLiSettingsWithoutLiSection();
+        checkWronglyWrittenSettings(liElements);
+        checkAttributesHaveValue(liElements);
+        checkLiPageValues(liElements);
+        checkLiSettingsKeys(liElements)
     });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
     const modalHTML = createModalHTML();
-    document.body.innerHTML += modalHTML;
+    const modalContainer = document.createElement('div');
+    modalContainer.innerHTML = modalHTML;
+    document.body.appendChild(modalContainer);
     generateCSS();
     toggleModal();
     runChecks();
@@ -98,9 +299,6 @@ function createModalHTML() {
             </div>
             <div class="ass_content">
                 <div id="w-node-_409b393b-78eb-73c3-19a0-b5eaabc02f13-1e00a484" class="ass_content-inner">
-                    <div class="ass_result-correct">
-                        <div class="ass_text">You did a great job.<br>No errors.</div>
-                    </div>
                 </div>
                 <a ass_check="" href="#" class="ass_button w-button">Run Attribute Check</a>
             </div>
@@ -118,6 +316,10 @@ function generateCSS() {
         --ass_box: rgba(255, 255, 255, .07);
         --ass_gren: #259d4d;
       }
+
+      .ass_result-error {
+        min-height: 8rem !important;
+      }
       
       .ass_component {
         color: #333;
@@ -128,7 +330,7 @@ function generateCSS() {
       }
       
       .ass_component-inner {
-        z-index: 9999999;
+        z-index: 999999999999;
         width: 25rem;
         height: 100vh;
         background-color: var(--ass_black);
@@ -234,12 +436,20 @@ function generateCSS() {
       }
       
       .ass_result-error {
-        border-top: 2px solid var(--ass_red);
-        background-color: var(--ass_box);
-        border-top-left-radius: .5rem;
-        border-top-right-radius: .5rem;
-        padding: 1.5rem 1.2rem;
+        display: flex;
         overflow: hidden;
+        padding-top: 1.5rem;
+        padding-right: 1.2rem;
+        padding-bottom: 1.5rem;
+        padding-left: 1.2rem;
+        justify-content: center;
+        align-items: center;
+        border-top-style: solid;
+        border-top-width: 2px;
+        border-top-color: var(--ass_red);
+        border-top-left-radius: 0.5rem;
+        border-top-right-radius: 0.5rem;
+        background-color: var(--ass_box);
       }
       
       .ass_result-correct {

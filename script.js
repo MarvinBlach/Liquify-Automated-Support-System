@@ -289,6 +289,8 @@ function clearSuccess() {
     successElements.forEach(element => element.remove());
 }
 
+
+
 function runChecks() {
     const checkButton = document.querySelector('[ass_check]');
     checkButton.addEventListener('click', function() {
@@ -324,15 +326,20 @@ function runChecks() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    const modalHTML = createModalHTML();
-    const modalContainer = document.createElement('div');
-    modalContainer.innerHTML = modalHTML;
-    modalContainer.style.position = 'relative'; // z-index only works on positioned elements
-    modalContainer.style.zIndex = '9999'; // any high number to ensure it's on top
-    document.body.appendChild(modalContainer);
-    generateCSS();
-    toggleModal();
-    runChecks();
+    const urlParams = new URLSearchParams(window.location.search);
+    const liAttributesSupport = urlParams.get('li-attributes-support');
+
+    if (liAttributesSupport === 'true') {
+        const modalHTML = createModalHTML();
+        const modalContainer = document.createElement('div');
+        modalContainer.innerHTML = modalHTML;
+        modalContainer.style.position = 'relative'; // z-index only works on positioned elements
+        modalContainer.style.zIndex = '9999'; // any high number to ensure it's on top
+        document.body.appendChild(modalContainer);
+        generateCSS();
+        toggleModal();
+        runChecks();
+    }
 });
 
 

@@ -36,22 +36,51 @@ function logAttributeStructure() {
 }
 
 
-function displayError(attributeName, reason, hasError = true) {
+function displayError(attributeName, reason) {
     const contentInner = document.querySelector('.ass_content-inner');
+    const errorMessage = `Error found in ${attributeName}: ${reason}`;
 
-    if (hasError) {
-        const errorMessage = `Error found in ${attributeName}: ${reason}`;
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'ass_result-error';
 
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'ass_result-error';
+    const textDiv = document.createElement('div');
+    textDiv.className = 'ass_text';
+    textDiv.textContent = errorMessage;
 
-        const textDiv = document.createElement('div');
-        textDiv.className = 'ass_text';
-        textDiv.textContent = errorMessage;
+    errorDiv.appendChild(textDiv);
+    contentInner.appendChild(errorDiv);
+}
 
-        errorDiv.appendChild(textDiv);
+let errorDisplayDelay = 0;
+
+function displayError(attributeName, reason) {
+    const contentInner = document.querySelector('.ass_content-inner');
+    const errorMessage = `Error found in ${attributeName}: ${reason}`;
+
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'ass_result-error';
+
+    const textDiv = document.createElement('div');
+    textDiv.className = 'ass_text';
+    textDiv.textContent = errorMessage;
+
+    errorDiv.appendChild(textDiv);
+
+    setTimeout(() => {
         contentInner.appendChild(errorDiv);
-    } else {
+        setTimeout(() => {
+            errorDiv.classList.add('shown');
+        }, 50);
+    }, errorDisplayDelay);
+
+    errorDisplayDelay += 50;
+}
+
+function displaySuccessMessage() {
+    const errorElements = document.querySelectorAll('.ass_result-error');
+
+    if (errorElements.length === 0) {
+        const contentInner = document.querySelector('.ass_content-inner');
         const successMessage = "You did a great job.<br>No errors.";
 
         const successDiv = document.createElement('div');
@@ -65,6 +94,8 @@ function displayError(attributeName, reason, hasError = true) {
         contentInner.appendChild(successDiv);
     }
 }
+
+
 
 
 function checkLiAttributes(liElements) {
@@ -253,13 +284,24 @@ function clearErrors() {
     errorElements.forEach(element => element.remove());
 }
 
-function runChecks() {
-    const liElements = [];
-    mapAttributes(document.documentElement, liElements);
+function clearSuccess() {
+    const successElements = document.querySelectorAll('.ass_result-correct');
+    successElements.forEach(element => element.remove());
+}
 
+
+
+function runChecks() {
     const checkButton = document.querySelector('[ass_check]');
     checkButton.addEventListener('click', function() {
+        // Disable the button
+        checkButton.disabled = true;
+
+        const liElements = [];
+        mapAttributes(document.documentElement, liElements);
+
         clearErrors();
+        clearSuccess();
         checkLiAttributes(liElements);
         checkDuplicateLiSections(liElements);
         checkLiElementsValues(liElements);
@@ -268,18 +310,36 @@ function runChecks() {
         checkWronglyWrittenSettings(liElements);
         checkAttributesHaveValue(liElements);
         checkLiPageValues(liElements);
-        checkLiSettingsKeys(liElements)
+        checkLiSettingsKeys(liElements);
+
+        // Wait for 1 second before displaying the success message and re-enabling the button
+        // Wait for 1 second before re-enabling the button
+        setTimeout(function() {
+            const errorElements = document.querySelectorAll('.ass_result-error');
+            if (errorElements.length === 0) {
+                displaySuccessMessage();
+            }
+            // Re-enable the button
+            checkButton.disabled = false;
+        }, 1000);
     });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    const modalHTML = createModalHTML();
-    const modalContainer = document.createElement('div');
-    modalContainer.innerHTML = modalHTML;
-    document.body.appendChild(modalContainer);
-    generateCSS();
-    toggleModal();
-    runChecks();
+    const urlParams = new URLSearchParams(window.location.search);
+    const liAttributesSupport = urlParams.get('li-attributes-support');
+
+    if (liAttributesSupport === 'true') {
+        const modalHTML = createModalHTML();
+        const modalContainer = document.createElement('div');
+        modalContainer.innerHTML = modalHTML;
+        modalContainer.style.position = 'relative'; // z-index only works on positioned elements
+        modalContainer.style.zIndex = '9999'; // any high number to ensure it's on top
+        document.body.appendChild(modalContainer);
+        generateCSS();
+        toggleModal();
+        runChecks();
+    }
 });
 
 
@@ -318,12 +378,18 @@ function generateCSS() {
       }
 
       .ass_result-error {
-        min-height: 8rem !important;
+        min-height: 9rem !important;
+        transition: opacity 0.5s ease-in-out;
+        opacity: 0;
       }
+
+      .ass_result-error.shown {
+        opacity: 1;
+    }
       
       .ass_component {
         color: #333;
-        font-family: Spacemono, sans-serif;
+        font-family: Inter, sans-serif;
         font-size: 14px;
         font-weight: 400;
         line-height: 20px;

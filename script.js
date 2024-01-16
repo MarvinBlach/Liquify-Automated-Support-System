@@ -1,3 +1,24 @@
+function fetchAndDisplayBadge() {
+    fetch('https://uploads-ssl.webflow.com/64be309a0c8ae7454454fcef/6530171402c93f290830bd0e_Liquify%20Badge.svg')
+        .then(response => response.text())
+        .then(svgContent => {
+            const webflowBadgeExists = document.querySelector('.w-webflow-badge') !== null;
+
+            const liquifyBadge = document.createElement('div');
+            liquifyBadge.className = 'liquify-badge';
+            liquifyBadge.innerHTML = svgContent;
+
+            if (webflowBadgeExists) {
+                liquifyBadge.style.bottom = "50px";
+            }
+
+            document.body.appendChild(liquifyBadge);
+        })
+        .catch(error => {
+            console.error('Error fetching the SVG:', error);
+        });
+}
+
 function toggleModal() {
     const closeButton = document.querySelector('[ass_closer]');
     const component = document.querySelector('.ass_component');
@@ -35,21 +56,6 @@ function logAttributeStructure() {
     console.log(attributeStructure);
 }
 
-
-function displayError(attributeName, reason) {
-    const contentInner = document.querySelector('.ass_content-inner');
-    const errorMessage = `Error found in ${attributeName}: ${reason}`;
-
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'ass_result-error';
-
-    const textDiv = document.createElement('div');
-    textDiv.className = 'ass_text';
-    textDiv.textContent = errorMessage;
-
-    errorDiv.appendChild(textDiv);
-    contentInner.appendChild(errorDiv);
-}
 
 let errorDisplayDelay = 0;
 
@@ -326,6 +332,10 @@ function runChecks() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+
+    fetchAndDisplayBadge();
+    badgeCSS();
+
     const urlParams = new URLSearchParams(window.location.search);
     const liAttributesSupport = urlParams.get('li-attributes-support');
 
@@ -336,11 +346,14 @@ document.addEventListener('DOMContentLoaded', function() {
         modalContainer.style.position = 'relative'; // z-index only works on positioned elements
         modalContainer.style.zIndex = '9999'; // any high number to ensure it's on top
         document.body.appendChild(modalContainer);
-        generateCSS();
         toggleModal();
+        generateCSS();
         runChecks();
     }
 });
+
+
+
 
 
 function createModalHTML() {
@@ -364,6 +377,39 @@ function createModalHTML() {
             </div>
         </div>
     </div>`;
+}
+
+function badgeCSS() {
+    const badger = `
+    .liquify-badge {
+        white-space: nowrap;
+        cursor: pointer;
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, .1), 0 1px 3px rgba(0, 0, 0, .1);
+        visibility: visible !important;
+        z-index: 999 !important;
+        color: #aaadb0 !important;
+        opacity: 1 !important;
+        width: auto !important;
+        height: auto !important;
+        background-color: #fff !important;
+        border-radius: 3px !important;
+        margin: 0 !important;
+        height: 32px !important;
+        text-decoration: none !important;
+        display: inline-block !important;
+        position: fixed !important;
+        top: auto !important;
+        bottom: 12px;
+        left: auto !important;
+        right: 12px !important;
+        overflow: visible !important;
+        transform: none !important;
+    }
+    `;
+
+    const style = document.createElement('style');
+    style.textContent = badger;
+    document.head.appendChild(style);
 }
 
 function generateCSS() {

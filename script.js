@@ -355,6 +355,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
+
 function createModalHTML() {
     return `
     <div class="ass_component">

@@ -333,11 +333,19 @@ function runChecks() {
 
 document.addEventListener('DOMContentLoaded', function() {
 
-    fetchAndDisplayBadge();
-    badgeCSS();
-
     const urlParams = new URLSearchParams(window.location.search);
     const liAttributesSupport = urlParams.get('li-attributes-support');
+
+    const scriptTag = document.querySelector('script[src*="http://127.0.0.1:5500/script.js"]');
+    let conversion = null;
+    if (scriptTag) {
+        conversion = scriptTag.getAttribute('conversion');
+    }
+
+    if (conversion === 'completed') {
+        fetchAndDisplayBadge();
+        badgeCSS();
+    }
 
     if (liAttributesSupport === 'true') {
         const modalHTML = createModalHTML();

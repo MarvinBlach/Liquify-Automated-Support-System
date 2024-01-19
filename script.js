@@ -279,6 +279,21 @@ function checkLiSettingsKeys(liElements) {
     });
 }
 
+function checkLiObjectKeys(liElements) {
+    const allowedKeys = ['text', 'src', 'alt', 'href', 'class', 'name', 'value', 'placeholder', 'width', 'height'];
+
+    liElements.forEach(({ element, attr }) => {
+        if (attr.name.startsWith('li-object:')) {
+            const key = attr.name.split(':')[1]; // Get the key after "li-object:"
+            if (!allowedKeys.includes(key)) {
+                console.log(`Found invalid key for li-object: ${attr.name}`);
+                highlightErrorElement(element);
+                displayError(attr.name, `You have used an invalid key: ${key}`);
+            }
+        }
+    });
+}
+
 
 function highlightErrorElement(element) {
     element.style.border = "4px solid red";
@@ -317,6 +332,7 @@ function runChecks() {
         checkAttributesHaveValue(liElements);
         checkLiPageValues(liElements);
         checkLiSettingsKeys(liElements);
+        checkLiObjectKeys(liElements);
 
         // Wait for 1 second before displaying the success message and re-enabling the button
         // Wait for 1 second before re-enabling the button

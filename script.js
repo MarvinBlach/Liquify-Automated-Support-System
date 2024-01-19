@@ -352,7 +352,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const urlParams = new URLSearchParams(window.location.search);
     const liAttributesSupport = urlParams.get('li-attributes-support');
 
-    const scriptTag = document.querySelector('script[src*="http://127.0.0.1:5500/script.js"]');
+    const scriptTag = document.querySelector('script[src*="https://cdn.jsdelivr.net/gh/marvinblach/liquify-automated-support-system@1.1/script.js"]');
     let conversion = null;
     if (scriptTag) {
         conversion = scriptTag.getAttribute('conversion');

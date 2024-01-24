@@ -368,7 +368,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const modalContainer = document.createElement('div');
         modalContainer.innerHTML = modalHTML;
         modalContainer.style.position = 'relative'; // z-index only works on positioned elements
-        modalContainer.style.zIndex = '9999'; // any high number to ensure it's on top
+        modalContainer.style.zIndex = '9999999999999'; // any high number to ensure it's on top
         document.body.appendChild(modalContainer);
         toggleModal();
         generateCSS();

@@ -131,7 +131,7 @@ function checkDuplicateLiSections(liElements) {
 
 
 function checkLiElementsValues(liElements) {
-    const allowedValues = ['direct-add-to-cart', 'mini-cart-toggle', 'mini-cart-item-count', 'mini-cart-empty', 'mini-cart', 'mini-cart-container', 'mini-cart-full', 'mini-cart-item', 'mini-cart-item-increase', 'mini-cart-item-decrease', 'mini-cart-item-remove', 'mini-cart-item-quantity'];
+    const allowedValues = ['product-variant-container', 'add-to-cart', 'add-to-cart-quantity', 'product-options-loop', 'product-options-name', 'product-option-loop', 'product-option-input', 'product-option-name', 'direct-add-to-cart', 'mini-cart-toggle', 'mini-cart-item-count', 'mini-cart-empty', 'mini-cart', 'mini-cart-container', 'mini-cart-full', 'mini-cart-item', 'mini-cart-item-increase', 'mini-cart-item-decrease', 'mini-cart-item-remove', 'mini-cart-item-quantity'];
     const liElementsValues = {};
 
     liElements.forEach(({ element, attr }) => {

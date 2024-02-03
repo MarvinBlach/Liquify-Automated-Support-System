@@ -697,7 +697,7 @@ function generateCSS() {
       .ass_header-inner {
         flex-direction: column;
         align-items: flex-start;
-        margin-top: .275rem;
+        margin-top: .575rem;
         display: flex;
       }
 
@@ -744,7 +744,7 @@ function generateCSS() {
       }
 
       .ass_text {
-        font-size: 0.85rem;
+        font-size: 0.9rem;
       }
       
       .ass_text-large {
@@ -766,10 +766,12 @@ function generateCSS() {
       
       .attribute_error {
         color: var(--ass_red);
-        background-color: #f3ecef;
-        padding: .35rem;
+        background-color: rgba(228, 47, 58, 0.10);
+        border-radius: .5rem;
+        padding: .2rem 0.5rem;
         font-family: Sourcecodepro, sans-serif;
         font-weight: 600;
+        font-size: .8rem;
       }
       
       .ass_result-error-message {
@@ -793,11 +795,12 @@ function generateCSS() {
       }
       
       .ass_button-link:hover {
-        background-color: #f3edef;
+        color: #fd4038;
+        background-color: #faf9f9;
       }
       
       .ass_button-text {
-        font-size: .75rem;
+        font-size: .8rem;
         font-weight: 600;
         text-decoration: none;
       }
@@ -836,21 +839,21 @@ function generateCSS() {
 
       @font-face {
         font-family: 'Inter';
-        src: url('../fonts/Inter-SemiBold.ttf') format('truetype');
+        src: url('https://assets.website-files.com/65a17c2d42e84ed31e00a473/65be3670fca0ab56c8346ce4_Inter-SemiBold.ttf') format('truetype');
         font-weight: 600;
         font-style: normal;
         font-display: swap;
       }
       @font-face {
         font-family: 'Sourcecodepro';
-        src: url('../fonts/SourceCodePro-SemiBold.ttf') format('truetype');
+        src: url('https://assets.website-files.com/65a17c2d42e84ed31e00a473/65be36b0db0e7f3c3334b395_SourceCodePro-SemiBold.ttf') format('truetype');
         font-weight: 600;
         font-style: normal;
         font-display: swap;
       }
       @font-face {
         font-family: 'Inter';
-        src: url('../fonts/Inter-Regular.ttf') format('truetype');
+        src: url('https://assets.website-files.com/65a17c2d42e84ed31e00a473/65be3a4322fa5cd707ece9db_Inter-Regular.ttf') format('truetype');
         font-weight: 400;
         font-style: normal;
         font-display: swap;

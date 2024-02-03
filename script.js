@@ -121,7 +121,7 @@ function displaySuccessMessage() {
 
     if (errorElements.length === 0) {
         const contentInner = document.querySelector('.ass_content-inner');
-        const successMessage = "You did a great job.<br>No errors.";
+        const successMessage = "<strong>You did a great job.</strong><br>No errors.";
 
         const successDiv = document.createElement('div');
         successDiv.className = 'ass_result-correct';
@@ -644,6 +644,14 @@ function generateCSS() {
       
       .ass_button:hover {
         background-color: #5e6ae9;
+      }
+
+      .ass_component {
+        font-family: 'Inter' !important;
+      }
+
+      .ass_component.ass_closed {
+       transform: translate(25rem, 0px);
       }
       
       .ass_result-error {

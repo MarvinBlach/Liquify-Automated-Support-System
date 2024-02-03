@@ -60,49 +60,60 @@ function logAttributeStructure() {
 let errorDisplayDelay = 0;
 
 function displayError(attributeName, reason, errorId) {
-    const contentInner = document.querySelector('.ass_content-inner');
+        const contentInner = document.querySelector('.ass_content-inner');
 
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'ass_result-error';
+        const errorHTML = `
+                <div class="ass_result-error">
+                        <div class="ass_result-error-inner">
+                                <div class="ass_text">${reason}</div>
+                                <div class="ass_result-error-message">
+                                        <div class="attribute_error" ass_key="">${attributeName}</div>
+                                        <div class="ass_text ass_error">=</div>
+                                        <div class="attribute_error" ass_value="">${errorId}</div>
+                                </div>
+                        </div>
+                        <div class="ass_result-error-tip">
+              <a href="#error${errorCount}" class="ass_button-link w-inline-block">
+                                <div class="icon-embed-xxsmall w-embed">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewbox="0 0 12 12" fill="none" preserveaspectratio="xMidYMid meet" aria-hidden="true" role="img">
+                                <mask id="mask0_1640_8337" style="mask-type:alpha" maskunits="userSpaceOnUse" x="0" y="0" width="12" height="12">
+                                  <rect width="12" height="12" fill="#D9D9D9"></rect>
+                                </mask>
+                                <g mask="url(#mask0_1640_8337)">
+                                  <path d="M8.5 10V5H3.9125L5.7125 6.8L5.0125 7.5125L2 4.5L5 1.5L5.7125 2.2125L3.9125 4H9.5V10H8.5Z" fill="#DA615C"></path>
+                                </g>
+                              </svg>
+                                </div>
+                                <div class="ass_button-text">Jump to Error</div>
+                            </a>
+                            <a href="#" class="ass_button-docu w-inline-block">
+                                <div class="icon-embed-xxsmall w-embed">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewbox="0 0 13 13" fill="none" preserveaspectratio="xMidYMid meet" aria-hidden="true" role="img">
+                                <mask id="mask0_1640_8639" style="mask-type:alpha" maskunits="userSpaceOnUse" x="0" y="0" width="13" height="13">
+                                  <rect x="0.5" y="0.5" width="12" height="12" fill="#D9D9D9"></rect>
+                                </mask>
+                                <g mask="url(#mask0_1640_8639)">
+                                  <path d="M6.475 9.5C6.65 9.5 6.79792 9.43958 6.91875 9.31875C7.03958 9.19792 7.1 9.05 7.1 8.875C7.1 8.7 7.03958 8.55208 6.91875 8.43125C6.79792 8.31042 6.65 8.25 6.475 8.25C6.3 8.25 6.15208 8.31042 6.03125 8.43125C5.91042 8.55208 5.85 8.7 5.85 8.875C5.85 9.05 5.91042 9.19792 6.03125 9.31875C6.15208 9.43958 6.3 9.5 6.475 9.5ZM6.025 7.575H6.95C6.95 7.3 6.98125 7.08333 7.04375 6.925C7.10625 6.76667 7.28333 6.55 7.575 6.275C7.79167 6.05833 7.9625 5.85208 8.0875 5.65625C8.2125 5.46042 8.275 5.225 8.275 4.95C8.275 4.48333 8.10417 4.125 7.7625 3.875C7.42083 3.625 7.01667 3.5 6.55 3.5C6.075 3.5 5.68958 3.625 5.39375 3.875C5.09792 4.125 4.89167 4.425 4.775 4.775L5.6 5.1C5.64167 4.95 5.73542 4.7875 5.88125 4.6125C6.02708 4.4375 6.25 4.35 6.55 4.35C6.81667 4.35 7.01667 4.42292 7.15 4.56875C7.28333 4.71458 7.35 4.875 7.35 5.05C7.35 5.21667 7.3 5.37292 7.2 5.51875C7.1 5.66458 6.975 5.8 6.825 5.925C6.45833 6.25 6.23333 6.49583 6.15 6.6625C6.06667 6.82917 6.025 7.13333 6.025 7.575ZM6.5 11.5C5.80833 11.5 5.15833 11.3687 4.55 11.1062C3.94167 10.8438 3.4125 10.4875 2.9625 10.0375C2.5125 9.5875 2.15625 9.05833 1.89375 8.45C1.63125 7.84167 1.5 7.19167 1.5 6.5C1.5 5.80833 1.63125 5.15833 1.89375 4.55C2.15625 3.94167 2.5125 3.4125 2.9625 2.9625C3.4125 2.5125 3.94167 2.15625 4.55 1.89375C5.15833 1.63125 5.80833 1.5 6.5 1.5C7.19167 1.5 7.84167 1.63125 8.45 1.89375C9.05833 2.15625 9.5875 2.5125 10.0375 2.9625C10.4875 3.4125 10.8438 3.94167 11.1062 4.55C11.3687 5.15833 11.5 5.80833 11.5 6.5C11.5 7.19167 11.3687 7.84167 11.1062 8.45C10.8438 9.05833 10.4875 9.5875 10.0375 10.0375C9.5875 10.4875 9.05833 10.8438 8.45 11.1062C7.84167 11.3687 7.19167 11.5 6.5 11.5ZM6.5 10.5C7.61667 10.5 8.5625 10.1125 9.3375 9.3375C10.1125 8.5625 10.5 7.61667 10.5 6.5C10.5 5.38333 10.1125 4.4375 9.3375 3.6625C8.5625 2.8875 7.61667 2.5 6.5 2.5C5.38333 2.5 4.4375 2.8875 3.6625 3.6625C2.8875 4.4375 2.5 5.38333 2.5 6.5C2.5 7.61667 2.8875 8.5625 3.6625 9.3375C4.4375 10.1125 5.38333 10.5 6.5 10.5Z" fill="#82898C"></path>
+                                </g>
+                              </svg>
+                                </div>
+                                <div class="ass_button-text">Go to Docs</div>
+                            </a>
+                        </div>
+                </div>
+        `;
 
-    const errorInnerDiv = document.createElement('div');
-    errorInnerDiv.className = 'ass_result-error-inner';
-
-    const reasonDiv = document.createElement('div');
-    reasonDiv.className = 'ass_text';
-    reasonDiv.textContent = reason;
-
-    const errorMessageDiv = document.createElement('div');
-    errorMessageDiv.className = 'ass_result-error-message';
-
-    const attributeErrorDiv = document.createElement('div');
-    attributeErrorDiv.className = 'attribute_error';
-    attributeErrorDiv.textContent = attributeName;
-    attributeErrorDiv.setAttribute('ass_key', '');
-
-    const equalsDiv = document.createElement('div');
-    equalsDiv.className = 'ass_text ass_error';
-    equalsDiv.textContent = '=';
-
-    const valueErrorDiv = document.createElement('div');
-    valueErrorDiv.className = 'attribute_error';
-    valueErrorDiv.textContent = errorId; // Assuming errorId is the value of the error element
-    valueErrorDiv.setAttribute('ass_value', ''); // Add ass_value attribute
-
-    // Append the elements to form the error message structure
-    errorMessageDiv.append(attributeErrorDiv, equalsDiv, valueErrorDiv);
-    errorInnerDiv.append(reasonDiv, errorMessageDiv);
-    errorDiv.appendChild(errorInnerDiv);
-
-    // Add the errorDiv to the DOM after a delay
-    setTimeout(() => {
-        contentInner.appendChild(errorDiv);
+        // Add the errorHTML to the DOM after a delay
         setTimeout(() => {
-            errorDiv.classList.add('shown');
-        }, 50);
-    }, errorDisplayDelay);
+                contentInner.insertAdjacentHTML('beforeend', errorHTML);
+                const errorDiv = contentInner.lastElementChild; // Save a reference to the error div
 
-    errorDisplayDelay += 50;
+                setTimeout(() => {
+                        errorDiv.classList.add('shown'); // Use the saved reference
+                }, 50);
+        }, errorDisplayDelay);
+
+        errorDisplayDelay += 50;
 }
 
 function displaySuccessMessage() {
@@ -348,6 +359,17 @@ function clearSuccess() {
     successElements.forEach(element => element.remove());
 }
 
+function checkAssQuantAttribute() {
+    const elements = document.querySelectorAll('[ass_quant]'); // Select all elements with the 'ass_quant' attribute
+
+    elements.forEach(element => {
+        console.log(`Found element with ass_quant attribute: ${element.outerHTML}`);
+        element.textContent = errorCount; // Set the text of the element to the total error count
+    });
+
+    console.log(`Total number of errors found: ${errorCount}`);
+}
+
 
 
 function runChecks() {
@@ -371,9 +393,8 @@ function runChecks() {
         checkLiPageValues(liElements);
         checkLiSettingsKeys(liElements);
         checkLiObjectKeys(liElements);
+        checkAssQuantAttribute();
 
-        // Wait for 1 second before displaying the success message and re-enabling the button
-        // Wait for 1 second before re-enabling the button
         setTimeout(function() {
             const errorElements = document.querySelectorAll('.ass_result-error');
             if (errorElements.length === 0) {
@@ -487,7 +508,7 @@ function createModalHTML() {
       <div class="ass_content">
         <div class="ass_content-counter">
           <div class="ass_text-large">Errors</div>
-          <div class="ass_text-large ass_smaller">(<span ass_quant="">14</span>)</div>
+          <div class="ass_text-large ass_smaller">(<span ass_quant="">0</span>)</div>
         </div>
         <div id="w-node-_409b393b-78eb-73c3-19a0-b5eaabc02f13-1e00a484" class="ass_content-inner">
       </div>

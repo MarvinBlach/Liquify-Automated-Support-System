@@ -59,7 +59,7 @@ function logAttributeStructure() {
 
 let errorDisplayDelay = 0;
 
-function displayError(attributeName, reason, errorId) {
+function displayError(attributeName, reason, errorId, docLink) {
         const contentInner = document.querySelector('.ass_content-inner');
 
         const errorHTML = `
@@ -86,7 +86,7 @@ function displayError(attributeName, reason, errorId) {
                                 </div>
                                 <div class="ass_button-text">Jump to Error</div>
                             </a>
-                            <a href="#" class="ass_button-docu w-inline-block">
+                            <a href="${docLink}" target="_blank" class="ass_button-docu w-inline-block">
                                 <div class="icon-embed-xxsmall w-embed">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewbox="0 0 13 13" fill="none" preserveaspectratio="xMidYMid meet" aria-hidden="true" role="img">
                                 <mask id="mask0_1640_8639" style="mask-type:alpha" maskunits="userSpaceOnUse" x="0" y="0" width="13" height="13">
@@ -143,7 +143,7 @@ function checkLiAttributes(liElements) {
         const pageWrapper = document.querySelector('.page-wrapper');
         if (!pageWrapper.contains(element) && element.tagName !== 'BODY') {
             highlightErrorElement(element);
-            displayError(attr.name, 'Attribute found outside of .page-wrapper and is not the body element', attr.value, errorCount);
+            displayError(attr.name, 'Attribute found outside of .page-wrapper and is not the body element', attr.value, 'https://www.liquify.pro/docu/getting-started#Template-Structure');
         }
     });
 }
@@ -156,7 +156,7 @@ function checkDuplicateLiSections(liElements) {
             if (liSectionValues[attr.value]) {
                 highlightErrorElement(element);
                 
-                displayError(attr.name, 'Duplicate value found:', attr.value, errorCount);
+                displayError(attr.name, 'Duplicate value found:', attr.value, 'https://www.liquify.pro/docu/getting-started#Liquid-Settings');
             } else {
                 liSectionValues[attr.value] = true;
             }
@@ -173,10 +173,10 @@ function checkLiElementsValues(liElements) {
         if (attr.name === 'li-elements') {
             if (!allowedValues.includes(attr.value)) {
                 highlightErrorElement(element);
-                displayError(attr.name, 'Invalid value found:', attr.value, errorCount);
+                displayError(attr.name, 'Invalid value found:', attr.value, 'https://www.liquify.pro/docu/liquify-elements');
             } else if (liElementsValues[attr.value]) {
                 highlightErrorElement(element);
-                displayError(attr.name, 'Duplicate value found:', attr.value, errorCount);
+                displayError(attr.name, 'Duplicate value found:', attr.value, 'https://www.liquify.pro/docu/liquify-elements');
             } else {
                 liElementsValues[attr.value] = true;
             }
@@ -212,7 +212,7 @@ function checkDuplicateLiSettings() {
                         console.log(`Duplicate attribute found in ${sectionName}: ${key}`);
                         highlightErrorElement(descendant); // Add this line
                         const [attrName, attrValue] = key.split('=');
-                        displayError(attrName, `Duplicate attribute found in section ${sectionName}:`, attrValue, errorCount);
+                        displayError(attrName, `Duplicate attribute found in section ${sectionName}:`, attrValue, 'https://www.liquify.pro/docu/liquify-elements');
                     } else {
                         settingsMap[key] = true;
                     }
@@ -247,7 +247,7 @@ function checkLiSettingsWithoutLiSection() {
             liSettingsAttributes.forEach(attr => {
                 let attrValue = attr.value; // Get the value of the 'li-settings' attribute
                 attrValue = attrValue ? attrValue : '{empty} '; // Set attrValue to a space if it's empty
-                displayError(attr.name, `Found '${attr.name}' without 'li-section' on the page:`, attrValue, errorCount);
+                displayError(attr.name, `Found '${attr.name}' without 'li-section' on the page:`, attrValue, 'https://www.liquify.pro/docu/liquify-elements');
             });
             foundError = true;
         }
@@ -264,7 +264,7 @@ function checkWronglyWrittenSettings(liElements) {
             highlightErrorElement(element); // Add this line
             let attrValue = attr.value; // Get the value of the wrongly written settings attribute
             attrValue = attrValue ? attrValue : ' '; // Set attrValue to a space if it's empty
-            displayError(attr.name, 'Found wrongly written settings word:', attrValue, errorCount);
+            displayError(attr.name, 'Found wrongly written settings word:', attrValue, 'https://www.liquify.pro/docu/liquify-elements');
         }
     });
 }
@@ -276,11 +276,11 @@ function checkAttributesHaveValue(liElements) {
         if (attributesToCheck.includes(attr.name) && !attr.value) {
             console.log(`Found attribute without value: ${element.outerHTML}`);
             highlightErrorElement(element); // Add this line
-            displayError(attr.name, 'Attribute value is empty.', '{empty}', errorCount);
+            displayError(attr.name, 'Attribute value is empty.', '{empty}', 'https://www.liquify.pro/docu/getting-started');
         } else if (attr.name.startsWith('li-settings') && !attr.value) {
             console.log(`Found li-settings attribute without value: ${element.outerHTML}`);
             highlightErrorElement(element); // Add this line
-            displayError(attr.name, 'li-settings attribute value is empty.', '{empty}', errorCount);
+            displayError(attr.name, 'li-settings attribute value is empty.', '{empty}', 'https://www.liquify.pro/docu/liquify-elements');
         }
     });
 }
@@ -297,7 +297,7 @@ function checkLiPageValues(liElements) {
             if (!validValues.includes(baseValue) && !isAlternative) {
                 console.log(`Found invalid li-page value: ${element.outerHTML}`);
                 highlightErrorElement(element); // Add this line
-                displayError(attr.name, 'Invalid li-page value:', attr.value, errorCount);
+                displayError(attr.name, 'Invalid li-page value:', attr.value, 'https://www.liquify.pro/docu/getting-started#Template-Structure');
             }
         }
     });
@@ -316,7 +316,7 @@ function checkLiSettingsKeys(liElements) {
                 highlightErrorElement(element); // Add this line
                 let attrValue = attr.value; // Get the value of the 'li-settings' attribute
                 attrValue = attrValue ? attrValue : ' '; // Set attrValue to a space if it's empty
-                displayError(attr.name, `Invalid li-settings key: '${key}'`, attrValue, errorCount);
+                displayError(attr.name, `Invalid li-settings key: '${key}'`, attrValue, 'https://www.liquify.pro/docu/getting-started#Liquid-Settings');
             }
         }
     });
@@ -333,7 +333,7 @@ function checkLiObjectKeys(liElements) {
                 highlightErrorElement(element);
                 let attrValue = attr.value; // Get the value of the 'li-object' attribute
                 attrValue = attrValue ? attrValue : ' '; // Set attrValue to a space if it's empty
-                displayError(attr.name, `You have used an invalid key: '${key}'`, attrValue, errorCount);
+                displayError(attr.name, `You have used an invalid key: '${key}'`, attrValue, 'https://www.liquify.pro/docu/getting-started#Liquid-Objects');
             }
         }
     });
@@ -346,6 +346,7 @@ function highlightErrorElement(element) {
     errorCount++; // Increment the counter
     element.id = `error${errorCount}`; // Assign a unique id to the element
     element.style.border = "4px solid red";
+    element.style.borderRadius = "4px";
 }
 
 
@@ -740,6 +741,10 @@ function generateCSS() {
         align-items: start;
         padding: 7.5rem 1.3rem 1.4rem;
         display: flex;
+      }
+
+      .ass_text {
+        font-size: 0.85rem;
       }
       
       .ass_text-large {

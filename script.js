@@ -61,7 +61,6 @@ let errorDisplayDelay = 0;
 
 function displayError(attributeName, reason, errorId) {
     const contentInner = document.querySelector('.ass_content-inner');
-    const errorMessage = `Duplicate attribute found in ${attributeName}: ${reason}`;
 
     const errorDiv = document.createElement('div');
     errorDiv.className = 'ass_result-error';
@@ -69,9 +68,9 @@ function displayError(attributeName, reason, errorId) {
     const errorInnerDiv = document.createElement('div');
     errorInnerDiv.className = 'ass_result-error-inner';
 
-    const textDiv = document.createElement('div');
-    textDiv.className = 'ass_text';
-    textDiv.textContent = 'Duplicate attribute found in';
+    const reasonDiv = document.createElement('div');
+    reasonDiv.className = 'ass_text';
+    reasonDiv.textContent = reason;
 
     const errorMessageDiv = document.createElement('div');
     errorMessageDiv.className = 'ass_result-error-message';
@@ -79,6 +78,7 @@ function displayError(attributeName, reason, errorId) {
     const attributeErrorDiv = document.createElement('div');
     attributeErrorDiv.className = 'attribute_error';
     attributeErrorDiv.textContent = attributeName;
+    attributeErrorDiv.setAttribute('ass_key', '');
 
     const equalsDiv = document.createElement('div');
     equalsDiv.className = 'ass_text ass_error';
@@ -86,11 +86,12 @@ function displayError(attributeName, reason, errorId) {
 
     const valueErrorDiv = document.createElement('div');
     valueErrorDiv.className = 'attribute_error';
-    valueErrorDiv.textContent = reason;
+    valueErrorDiv.textContent = errorId; // Assuming errorId is the value of the error element
+    valueErrorDiv.setAttribute('ass_value', ''); // Add ass_value attribute
 
     // Append the elements to form the error message structure
     errorMessageDiv.append(attributeErrorDiv, equalsDiv, valueErrorDiv);
-    errorInnerDiv.append(textDiv, errorMessageDiv);
+    errorInnerDiv.append(reasonDiv, errorMessageDiv);
     errorDiv.appendChild(errorInnerDiv);
 
     // Add the errorDiv to the DOM after a delay
@@ -131,7 +132,7 @@ function checkLiAttributes(liElements) {
         const pageWrapper = document.querySelector('.page-wrapper');
         if (!pageWrapper.contains(element) && element.tagName !== 'BODY') {
             highlightErrorElement(element);
-            displayError(attr.name, 'Attribute found outside of .page-wrapper and is not the body element', errorCount);
+            displayError(attr.name, 'Attribute found outside of .page-wrapper and is not the body element', attr.value, errorCount);
         }
     });
 }
@@ -142,8 +143,9 @@ function checkDuplicateLiSections(liElements) {
     liElements.forEach(({ element, attr }) => {
         if (attr.name === 'li-section') {
             if (liSectionValues[attr.value]) {
-                highlightErrorElement(element); // Add this line
-                displayError(attr.name, `Duplicate value found: ${attr.value}`, errorCount);
+                highlightErrorElement(element);
+                
+                displayError(attr.name, 'Duplicate value found:', attr.value, errorCount);
             } else {
                 liSectionValues[attr.value] = true;
             }
@@ -159,11 +161,11 @@ function checkLiElementsValues(liElements) {
     liElements.forEach(({ element, attr }) => {
         if (attr.name === 'li-elements') {
             if (!allowedValues.includes(attr.value)) {
-                highlightErrorElement(element); // Add this line
-                displayError(attr.name, `Invalid value found: ${attr.value}`, errorCount);
+                highlightErrorElement(element);
+                displayError(attr.name, 'Invalid value found:', attr.value, errorCount);
             } else if (liElementsValues[attr.value]) {
-                highlightErrorElement(element); // Add this line
-                displayError(attr.name, `Duplicate value found: ${attr.value}`, errorCount);
+                highlightErrorElement(element);
+                displayError(attr.name, 'Duplicate value found:', attr.value, errorCount);
             } else {
                 liElementsValues[attr.value] = true;
             }
@@ -198,7 +200,8 @@ function checkDuplicateLiSettings() {
                     if (settingsMap[key]) {
                         console.log(`Duplicate attribute found in ${sectionName}: ${key}`);
                         highlightErrorElement(descendant); // Add this line
-                        displayError(`li-section`, `Duplicate attribute found in ${sectionName}: ${key}`, errorCount);
+                        const [attrName, attrValue] = key.split('=');
+                        displayError(attrName, `Duplicate attribute found in section ${sectionName}:`, attrValue, errorCount);
                     } else {
                         settingsMap[key] = true;
                     }
@@ -229,14 +232,17 @@ function checkLiSettingsWithoutLiSection() {
         if (!foundLiSection) {
             console.log(`Found li-settings without li-section: ${element.outerHTML}`);
             highlightErrorElement(element); // Add this line
+            const liSettingsAttributes = Array.from(element.attributes).filter(attr => attr.name.startsWith('li-settings'));
+            liSettingsAttributes.forEach(attr => {
+                let attrValue = attr.value; // Get the value of the 'li-settings' attribute
+                attrValue = attrValue ? attrValue : '{empty} '; // Set attrValue to a space if it's empty
+                displayError(attr.name, `Found '${attr.name}' without 'li-section' on the page:`, attrValue, errorCount);
+            });
             foundError = true;
         }
     });
-
-    if (foundError) {
-        displayError(`li-settings`, `Found one or more 'li-settings' without 'li-section' on the page.`, errorCount);
-    }
 }
+
 
 function checkWronglyWrittenSettings(liElements) {
     const wronglyWrittenSettingsVariants = ['li-setings', 'li-settngs', 'li-settins'];
@@ -245,7 +251,9 @@ function checkWronglyWrittenSettings(liElements) {
         if (wronglyWrittenSettingsVariants.some(variant => attr.name.startsWith(variant))) {
             console.log(`Found wrongly written settings word: ${element.outerHTML}`);
             highlightErrorElement(element); // Add this line
-            displayError(attr.name, 'Found wrongly written settings word.', errorCount);
+            let attrValue = attr.value; // Get the value of the wrongly written settings attribute
+            attrValue = attrValue ? attrValue : ' '; // Set attrValue to a space if it's empty
+            displayError(attr.name, 'Found wrongly written settings word:', attrValue, errorCount);
         }
     });
 }
@@ -257,11 +265,11 @@ function checkAttributesHaveValue(liElements) {
         if (attributesToCheck.includes(attr.name) && !attr.value) {
             console.log(`Found attribute without value: ${element.outerHTML}`);
             highlightErrorElement(element); // Add this line
-            displayError(attr.name, 'Attribute value is empty.', errorCount);
+            displayError(attr.name, 'Attribute value is empty.', '{empty}', errorCount);
         } else if (attr.name.startsWith('li-settings') && !attr.value) {
             console.log(`Found li-settings attribute without value: ${element.outerHTML}`);
             highlightErrorElement(element); // Add this line
-            displayError(attr.name, 'li-settings attribute value is empty.', errorCount);
+            displayError(attr.name, 'li-settings attribute value is empty.', '{empty}', errorCount);
         }
     });
 }
@@ -278,7 +286,7 @@ function checkLiPageValues(liElements) {
             if (!validValues.includes(baseValue) && !isAlternative) {
                 console.log(`Found invalid li-page value: ${element.outerHTML}`);
                 highlightErrorElement(element); // Add this line
-                displayError(attr.name, 'Invalid li-page value.', errorCount);
+                displayError(attr.name, 'Invalid li-page value:', attr.value, errorCount);
             }
         }
     });
@@ -295,7 +303,9 @@ function checkLiSettingsKeys(liElements) {
             if (!validKeys.includes(key)) {
                 console.log(`Found invalid li-settings key: ${key}`);
                 highlightErrorElement(element); // Add this line
-                displayError(attr.name, 'Invalid li-settings key.', errorCount);
+                let attrValue = attr.value; // Get the value of the 'li-settings' attribute
+                attrValue = attrValue ? attrValue : ' '; // Set attrValue to a space if it's empty
+                displayError(attr.name, `Invalid li-settings key: '${key}'`, attrValue, errorCount);
             }
         }
     });
@@ -310,7 +320,9 @@ function checkLiObjectKeys(liElements) {
             if (!allowedKeys.includes(key)) {
                 console.log(`Found invalid key for li-object: ${attr.name}`);
                 highlightErrorElement(element);
-                displayError(attr.name, `You have used an invalid key: ${key}`, errorCount);
+                let attrValue = attr.value; // Get the value of the 'li-object' attribute
+                attrValue = attrValue ? attrValue : ' '; // Set attrValue to a space if it's empty
+                displayError(attr.name, `You have used an invalid key: '${key}'`, attrValue, errorCount);
             }
         }
     });

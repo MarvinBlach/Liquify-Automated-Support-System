@@ -74,7 +74,7 @@ function displayError(attributeName, reason, errorId, docLink) {
                         </div>
                         <div class="ass_result-error-tip">
               <a href="#error${errorCount}" class="ass_button-link w-inline-block">
-                                <div class="icon-embed-xxsmall w-embed">
+                                <div class="ass_icon-embed-xxsmall w-embed">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewbox="0 0 12 12" fill="none" preserveaspectratio="xMidYMid meet" aria-hidden="true" role="img">
                                 <mask id="mask0_1640_8337" style="mask-type:alpha" maskunits="userSpaceOnUse" x="0" y="0" width="12" height="12">
                                   <rect width="12" height="12" fill="#D9D9D9"></rect>
@@ -87,7 +87,7 @@ function displayError(attributeName, reason, errorId, docLink) {
                                 <div class="ass_button-text">Jump to Error</div>
                             </a>
                             <a href="${docLink}" target="_blank" class="ass_button-docu w-inline-block">
-                                <div class="icon-embed-xxsmall w-embed">
+                                <div class="ass_icon-embed-xxsmall w-embed">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewbox="0 0 13 13" fill="none" preserveaspectratio="xMidYMid meet" aria-hidden="true" role="img">
                                 <mask id="mask0_1640_8639" style="mask-type:alpha" maskunits="userSpaceOnUse" x="0" y="0" width="13" height="13">
                                   <rect x="0.5" y="0.5" width="12" height="12" fill="#D9D9D9"></rect>
@@ -212,7 +212,7 @@ function checkDuplicateLiSettings() {
                         console.log(`Duplicate attribute found in ${sectionName}: ${key}`);
                         highlightErrorElement(descendant); // Add this line
                         const [attrName, attrValue] = key.split('=');
-                        displayError(attrName, `Duplicate attribute found in section ${sectionName}:`, attrValue, 'https://www.liquify.pro/docu/liquify-elements');
+                        displayError(attrName, `Duplicate attribute found in section ${sectionName}:`, attrValue, 'https://www.liquify.pro/docu/getting-started#Liquid-Settings');
                     } else {
                         settingsMap[key] = true;
                     }
@@ -247,7 +247,7 @@ function checkLiSettingsWithoutLiSection() {
             liSettingsAttributes.forEach(attr => {
                 let attrValue = attr.value; // Get the value of the 'li-settings' attribute
                 attrValue = attrValue ? attrValue : '{empty} '; // Set attrValue to a space if it's empty
-                displayError(attr.name, `Found '${attr.name}' without 'li-section' on the page:`, attrValue, 'https://www.liquify.pro/docu/liquify-elements');
+                displayError(attr.name, `Found '${attr.name}' without 'li-section' on the page:`, attrValue, 'https://www.liquify.pro/docu/getting-started#Template-Structure');
             });
             foundError = true;
         }
@@ -264,7 +264,7 @@ function checkWronglyWrittenSettings(liElements) {
             highlightErrorElement(element); // Add this line
             let attrValue = attr.value; // Get the value of the wrongly written settings attribute
             attrValue = attrValue ? attrValue : ' '; // Set attrValue to a space if it's empty
-            displayError(attr.name, 'Found wrongly written settings word:', attrValue, 'https://www.liquify.pro/docu/liquify-elements');
+            displayError(attr.name, 'Found wrongly written settings word:', attrValue, 'https://www.liquify.pro/docu/getting-started#Liquid-Settings');
         }
     });
 }
@@ -345,7 +345,7 @@ let errorCount = 0; // Global counter for error ids
 function highlightErrorElement(element) {
     errorCount++; // Increment the counter
     element.id = `error${errorCount}`; // Assign a unique id to the element
-    element.style.border = "4px solid red";
+    element.style.outline = "4px solid red";
     element.style.borderRadius = "4px";
 }
 
@@ -588,6 +588,7 @@ function generateCSS() {
         background-repeat: repeat, no-repeat;
         background-size: auto, cover;
         position: relative;
+        color: var(--ass_black);
       }
       
     .ass_component {
@@ -832,6 +833,15 @@ function generateCSS() {
       
       .ass_button-docu:hover {
         color: #000;
+      }
+
+      .ass_icon-embed-xxsmall {
+        display: flex;
+        width: 1rem;
+        height: 1rem;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
       }
       
       .ass_icon-embed-small {

@@ -179,6 +179,7 @@ function checkDuplicateLiSettings() {
 
         const settingsMap = {};
         descendants.forEach(descendant => {
+            // Skip descendants that are inside a 'w-dyn-list' element
             if (descendant.closest('.w-dyn-item')) {
                 return;
             }

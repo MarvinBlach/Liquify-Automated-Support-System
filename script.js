@@ -179,6 +179,10 @@ function checkDuplicateLiSettings() {
 
         const settingsMap = {};
         descendants.forEach(descendant => {
+            if (descendant.closest('.w-dyn-item')) {
+                return;
+            }
+
             Array.from(descendant.attributes).forEach(attr => {
                 if (attr.name.startsWith('li-settings')) {
                     console.log(`Found attribute: ${attr.name}=${attr.value}`); // Log the attribute
@@ -200,6 +204,7 @@ function checkDuplicateLiSettings() {
         });
     });
 }
+
 
 function checkLiSettingsWithoutLiSection() {
     const allElements = document.querySelectorAll('*');

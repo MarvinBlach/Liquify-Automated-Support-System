@@ -345,6 +345,25 @@ function checkMultipleLiObjectKeys(liElements) {
 }
 
 
+function checkProductVariantsStructure() {
+  const productVariationsLoops = document.querySelectorAll('[li-product-variations-loop]');
+
+  productVariationsLoops.forEach(loop => {
+      const productVariantName = loop.querySelector('[li-product-variant-name]');
+      const productHeroRadioList = loop.querySelector('.product-hero_radio-list');
+      const productVariantOptionLoop = productHeroRadioList ? productHeroRadioList.querySelector('[li-product-variant-option-loop]') : null;
+      const productVariantOptionInput = productVariantOptionLoop ? productVariantOptionLoop.querySelector('[li-product-variant-option-input]') : null;
+      const productVariantOptionName = productVariantOptionLoop ? productVariantOptionLoop.querySelector('[li-product-variant-option-name]') : null;
+
+      if (!productVariantName || !productHeroRadioList || !productVariantOptionLoop || !productVariantOptionInput || !productVariantOptionName) {
+          console.log(`Incorrect structure found in li-product-variations-loop: ${loop.tagName}`);
+          highlightErrorElement(loop);
+          displayError('li-product-variations-loop', `Incorrect structure found in li-product-variations-loop:`, '{empty}', 'https://www.liquify.pro/docu/getting-started#Product-Variants');
+      }
+  });
+}
+
+
 let errorCount = 0; // Global counter for error ids
 
 function highlightErrorElement(element) {
@@ -400,7 +419,8 @@ function runChecks() {
         checkLiSettingsKeys(liElements);
         checkLiObjectKeys(liElements);
         checkAssQuantAttribute();
-        checkMultipleLiObjectKeys(liElements)
+        checkMultipleLiObjectKeys(liElements);
+        checkProductVariantsStructure();
 
         setTimeout(function() {
             const errorElements = document.querySelectorAll('.ass_result-error');

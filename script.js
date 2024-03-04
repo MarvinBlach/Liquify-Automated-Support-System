@@ -179,6 +179,11 @@ function checkDuplicateLiSettings() {
 
         const settingsMap = {};
         descendants.forEach(descendant => {
+            // Skip descendants that are inside a 'w-dyn-list' element
+            if (descendant.closest('.w-dyn-item')) {
+                return;
+            }
+
             Array.from(descendant.attributes).forEach(attr => {
                 if (attr.name.startsWith('li-settings')) {
                     console.log(`Found attribute: ${attr.name}=${attr.value}`); // Log the attribute
@@ -200,6 +205,7 @@ function checkDuplicateLiSettings() {
         });
     });
 }
+
 
 function checkLiSettingsWithoutLiSection() {
     const allElements = document.querySelectorAll('*');
@@ -318,6 +324,26 @@ function checkLiObjectKeys(liElements) {
     });
 }
 
+function checkMultipleLiObjectKeys(liElements) {
+  liElements.forEach(({ element, attr }) => {
+    // Filter the attributes of the element to get only those that start with 'li-object:'
+    const liObjectAttrs = Array.from(element.attributes).filter(attr => attr.name.startsWith('li-object:'));
+
+    // If there are more than one 'li-object' attributes, log an error
+    if (liObjectAttrs.length > 1) {
+      console.log(`Found multiple li-object keys on an element: ${element.outerHTML}`);
+      highlightErrorElement(element);
+
+      // Display an error for each 'li-object' attribute
+      liObjectAttrs.forEach(attr => {
+        let attrValue = attr.value; // Get the value of the 'li-object' attribute
+        attrValue = attrValue ? attrValue : ' '; // Set attrValue to a space if it's empty
+        displayError(attr.name, `Multiple li-object keys found on an element:`, attrValue, 'https://www.liquify.pro/docu/getting-started#Liquid-Objects');
+      });
+    }
+  });
+}
+
 
 let errorCount = 0; // Global counter for error ids
 
@@ -374,6 +400,7 @@ function runChecks() {
         checkLiSettingsKeys(liElements);
         checkLiObjectKeys(liElements);
         checkAssQuantAttribute();
+        checkMultipleLiObjectKeys(liElements)
 
         setTimeout(function() {
             const errorElements = document.querySelectorAll('.ass_result-error');

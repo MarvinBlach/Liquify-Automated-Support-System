@@ -444,8 +444,15 @@ function runChecks() {
 
 document.addEventListener('DOMContentLoaded', function() {
   const scriptTag = document.querySelector('script[src="https://cdn.jsdelivr.net/gh/liquify-pro/liquify-automated-support-system@latest/script.js"]');
-  const autoAttribute = scriptTag && scriptTag.hasAttribute('auto');
-  const minAttribute = scriptTag && scriptTag.hasAttribute('min');
+  const urlContainsWebflow = window.location.href.includes('.webflow.io');
+
+  let autoAttribute = false;
+  let minAttribute = false;
+
+  if (urlContainsWebflow) {
+    autoAttribute = scriptTag && scriptTag.hasAttribute('auto');
+    minAttribute = scriptTag && scriptTag.hasAttribute('min');
+  }
 
   const urlParams = new URLSearchParams(window.location.search);
   const liAttributesSupport = urlParams.get('li-attributes-support');

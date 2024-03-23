@@ -118,14 +118,17 @@ function displaySuccessMessage() {
 
 
 function checkLiAttributes(liElements) {
-    liElements.forEach(({ element, attr }) => {
-        const pageWrapper = document.querySelector('.page-wrapper');
-        if (!pageWrapper.contains(element) && element.tagName !== 'BODY') {
-            highlightErrorElement(element);
-            displayError(attr.name, 'Attribute found outside of .page-wrapper and is not the body element', attr.value, 'https://www.liquify.pro/docu/getting-started#Template-Structure');
-        }
-    });
+  liElements.forEach(({ element, attr }) => {
+    const pageWrapper = document.querySelector('.page-wrapper');
+    // Ignore elements with 'li-snippet' attributes
+    if (attr.name.startsWith('li-snippet')) return;
+    if (!pageWrapper.contains(element) && element.tagName !== 'BODY') {
+      highlightErrorElement(element);
+      displayError(attr.name, 'Attribute found outside of .page-wrapper and is not the body element', attr.value, 'https://www.liquify.pro/docu/getting-started#Template-Structure');
+    }
+  });
 }
+
 
 function checkDuplicateLiSections(liElements) {
     const liSectionValues = {};
@@ -271,7 +274,7 @@ function checkAttributesHaveValue(liElements) {
 }
 
 function checkLiPageValues(liElements) {
-    const validValues = ['blog', 'article', 'collection', 'categories', 'product', 'cart', 'gift-card', 'account', 'login', 'register', 'activate', 'reset', 'order', 'adresses', '404', 'password', 'search', 'remove'];
+    const validValues = ['blog', 'article', 'collection', 'categories', 'product', 'cart', 'gift-card', 'account', 'login', 'register', 'activate', 'reset', 'order', 'adresses', '404', 'password', 'search', 'remove', 'giftcard', 'addresses', 'page'];
 
     liElements.forEach(({ element, attr }) => {
         if (attr.name === 'li-page') {
@@ -331,15 +334,21 @@ function checkMultipleLiObjectKeys(liElements) {
 
     // If there are more than one 'li-object' attributes, log an error
     if (liObjectAttrs.length > 1) {
-      console.log(`Found multiple li-object keys on an element: ${element.outerHTML}`);
-      highlightErrorElement(element);
+      const attrNames = liObjectAttrs.map(attr => attr.name);
+      const isSrcAndAlt = attrNames.includes('li-object:src') && attrNames.includes('li-object:alt');
 
-      // Display an error for each 'li-object' attribute
-      liObjectAttrs.forEach(attr => {
-        let attrValue = attr.value; // Get the value of the 'li-object' attribute
-        attrValue = attrValue ? attrValue : ' '; // Set attrValue to a space if it's empty
-        displayError(attr.name, `Multiple li-object keys found on an element:`, attrValue, 'https://www.liquify.pro/docu/getting-started#Liquid-Objects');
-      });
+      // If the attributes are not both 'li-object:src' and 'li-object:alt', it's an error
+      if (!isSrcAndAlt) {
+        console.log(`Found multiple li-object keys on an element: ${element.outerHTML}`);
+        highlightErrorElement(element);
+
+        // Display an error for each 'li-object' attribute
+        liObjectAttrs.forEach(attr => {
+          let attrValue = attr.value; // Get the value of the 'li-object' attribute
+          attrValue = attrValue ? attrValue : ' '; // Set attrValue to a space if it's empty
+          displayError(attr.name, `Multiple li-object keys found on an element:`, attrValue, 'https://www.liquify.pro/docu/getting-started#Liquid-Objects');
+        });
+      }
     }
   });
 }

@@ -443,7 +443,7 @@ function runChecks() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  const scriptTag = document.querySelector('script[src="https://cdn.jsdelivr.net/gh/liquify-pro/liquify-automated-support-system@latest/script.js"]');
+  const scriptTag = document.querySelector('script[src="https://cdn.jsdelivr.net/gh/liquify-pro/core@latest/script.js"]');
   const urlContainsWebflow = window.location.href.includes('.webflow.io');
 
   let autoAttribute = false;

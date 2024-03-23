@@ -453,6 +453,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
+  
+  if(window.location.hostname.indexOf('.webflow.io') > -1) {
+    $(document).ready(function() {
+      console.log("Webflow.io Domain Detected, running Script");
+      $('[li-element="dropdown-toggle"]').on('click', function() {
+        var parentDropdown = $(this).closest('.w-dropdown-list');
+        parentDropdown.siblings('.w-dropdown-toggle').trigger('mouseup');
+      });
+    });
+  } else {
+    console.log("This script only runs on .webflow.io domains.");
+  }
+
+
 
 
 function createModalHTML() {

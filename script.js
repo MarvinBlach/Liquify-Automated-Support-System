@@ -596,6 +596,7 @@ function generateCSS() {
         background-size: auto, cover;
         position: relative;
         color: var(--ass_black);
+        backdrop-filter: blur(100px);
       }
       
     .ass_component {

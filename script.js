@@ -443,21 +443,32 @@ function runChecks() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+  const scriptTag = document.querySelector('script[src="https://cdn.jsdelivr.net/gh/liquify-pro/liquify-automated-support-system@latest/script.js"]');
+  const autoAttribute = scriptTag && scriptTag.hasAttribute('auto');
+  const minAttribute = scriptTag && scriptTag.hasAttribute('min');
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const liAttributesSupport = urlParams.get('li-attributes-support');
+  const urlParams = new URLSearchParams(window.location.search);
+  const liAttributesSupport = urlParams.get('li-attributes-support');
 
-    if (liAttributesSupport === 'true') {
-        const modalHTML = createModalHTML();
-        const modalContainer = document.createElement('div');
-        modalContainer.innerHTML = modalHTML;
-        modalContainer.style.position = 'relative'; // z-index only works on positioned elements
-        modalContainer.style.zIndex = '9999999999999'; // any high number to ensure it's on top
-        document.body.appendChild(modalContainer);
-        toggleModal();
-        generateCSS();
-        runChecks();
+  if (autoAttribute || liAttributesSupport === 'true') {
+    const modalHTML = createModalHTML();
+    const modalContainer = document.createElement('div');
+    modalContainer.innerHTML = modalHTML;
+    modalContainer.style.position = 'relative'; // z-index only works on positioned elements
+    modalContainer.style.zIndex = '9999999999999'; // any high number to ensure it's on top
+    document.body.appendChild(modalContainer);
+    toggleModal();
+    generateCSS();
+    runChecks();
+
+    // If the 'min' attribute is present, add the '.ass_closed' class to the '.ass_component' element
+    if (minAttribute) {
+      const assComponent = document.querySelector('.ass_component');
+      if (assComponent) {
+        assComponent.classList.add('ass_closed');
+      }
     }
+  }
 });
 
 
